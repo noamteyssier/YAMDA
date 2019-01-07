@@ -339,7 +339,7 @@ class TCM:
         return seqs
 
     def _erase_seqs_containing_motifs(self, seqs_onehot, ppm, ppm_bg, frac):
-        t = np.log((1 - frac) / frac)  # Threshold
+        t = np.log(((1 - frac) / frac).cpu())  # Threshold
         spec = np.log(ppm) - np.log(ppm_bg)  # spec matrix
         spec_revcomp = spec[::-1, ::-1]
         L, W = ppm.shape
@@ -350,7 +350,7 @@ class TCM:
                 seqs_onehot_filtered.append(s)
                 continue
             conv_signal = signal.convolve2d(spec, s, 'valid')[0]
-            s_has_motif = any(conv_signal > t)
+            s_has_motif = any(torch.from_numpy(conv_signal) > t)
             if self.revcomp:
                 conv_signal_revcomp = signal.convolve2d(spec_revcomp, s, 'valid')[0]
                 s_has_motif = s_has_motif or any(conv_signal_revcomp > t)
