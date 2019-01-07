@@ -317,7 +317,7 @@ class TCM:
         return log_likelihoods
 
     def _erase_motif_occurrences(self, seqs_onehot, ppm, ppm_bg, frac):
-        t = np.log((1 - frac) / frac)  # Threshold
+        t = np.log(((1 - frac) / frac).cpu())  # Threshold
         spec = np.log(ppm) - np.log(ppm_bg)  # spec matrix
         spec_revcomp = spec[::-1, ::-1]
         L, W = ppm.shape
@@ -328,7 +328,7 @@ class TCM:
                 continue
             indices = np.arange(seqlen - W + 1)
             conv_signal = signal.convolve2d(spec, s, 'valid')[0]
-            seq_motif_sites = indices[conv_signal > t]
+            seq_motif_sites = indices[torch.from_numpy(conv_signal) > t]
             if self.revcomp:
                 conv_signal_revcomp = signal.convolve2d(spec_revcomp, s, 'valid')[0]
                 seq_motif_sites_revcomp = indices[conv_signal_revcomp > t]
@@ -358,4 +358,3 @@ class TCM:
                 seqs_onehot_filtered.append(s)
         seqs = sequences.decode(seqs_onehot_filtered, self.alpha)
         return seqs
-
