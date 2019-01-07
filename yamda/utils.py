@@ -71,8 +71,12 @@ def save_meme(fname, ppms, nsites=None, alpha='dna'):
         f.write(motif_header)
 
         ppm_str = ''
+
         for j in range(w):
-            ppm_str += '%f %f %f %f\n' % tuple(1.0*ppm[:,j]/ppm[:,j].sum())
+            #ppm_str += '%f %f %f %f\n' % tuple(1.0*ppm[:,j]/ppm[:,j].sum())
+            ppm_str += '%f ' * ppm.shape[0] % tuple(1.0*ppm[:,j]/ppm[:,j].sum())
+            ppm_str += '\n'
+
         ppm_str += '\n'
         f.write(ppm_str)
 
